@@ -1,0 +1,201 @@
+#!/usr/bin/env python
+import os
+import sys
+import socket
+import resource
+import urlparse
+import urllib
+import json
+import time
+import logging
+
+logging.basicConfig()
+logger = logging.getLogger("cockpit-auth-ovirt")
+
+logger.setLevel(logging.DEBUG)
+
+try:
+    from urllib.request import Request, URLError, urlopen
+except:
+    from urllib2 import Request, URLError, urlopen
+
+KEY_FILE = "/host/etc/pki/ovirt-engine/keys/engine_id_rsa"
+OVIRT_CA = "/host/etc/pki/ovirt-engine/ca.pem"
+DEFAULT_API_HOST = "set_OVIRT_FQDN"
+COCKPIT_SSH_COMMAND = "/host/usr/libexec/cockpit-ssh"
+
+# Hard coding the user here, if this is no good
+# we can have it prompt for the user.
+DEFAULT_USER = "root"
+
+def usage():
+    sys.stderr.write("usage {} [user@]host[:port]\n".format(sys.argv[0]))
+    sys.exit(os.EX_USAGE)
+
+def send_auth_command(challenge, response):
+    cmd = {
+        "command": "authorize",
+    }
+
+    if challenge:
+        cmd["cookie"] = "session{}{}".format(os.getpid(), time.time())
+        cmd["challenge"] = challenge
+    if response:
+        cmd["response"] = response
+
+    text = json.dumps(cmd)
+    os.write(1, "{}\n\n{}".format(len(text)+1, text))
+
+def send_problem_init(problem, message, auth_methods):
+    cmd = {
+        "command": "init",
+        "problem": problem
+    }
+
+    if message:
+        cmd["message"] = message
+
+    if auth_methods:
+        cmd["auth-method-results"] = auth_methods
+
+    text = json.dumps(cmd)
+    os.write(1, "{}\n\n{}".format(len(text)+1, text))
+
+def read_size(fd):
+    sep = '\n'
+    size = 0
+    seen = 0
+
+    while True:
+        t = os.read(fd, 1)
+
+        if not t:
+            return 0
+
+        if t == '\n':
+            break
+
+        size = (size * 10) + int(t)
+        seen = seen + 1
+
+        if seen > 7:
+            raise ValueError("Invalid frame: size too long")
+
+    return size
+
+def read_frame(fd):
+    size = read_size(fd)
+
+    data = ""
+    while size > 0:
+        d = os.read(fd, size)
+        size = size - len(d)
+        data = data + d
+
+    return data
+
+def read_auth_reply():
+    data = read_frame(1)
+    cmd = json.loads(data)
+    response = cmd.get("response")
+    if cmd.get("command") != "authorize" or \
+       not cmd.get("cookie") or not response:
+        raise ValueError("Did not receive a valid authorize command")
+
+    return response
+
+def read_key():
+    data = ""
+    # RSA header is supported only
+    # unsupported fingerprints etc. are removed from the beginning
+    with open(KEY_FILE, 'r') as fp:
+	while not '-----BEGIN' in fp.next():
+            pass
+        data = "-----BEGIN RSA PRIVATE KEY-----\n"
+        for line in fp:
+            data += line.replace("-----END PRIVATE KEY", "-----END RSA PRIVATE KEY")
+    return data
+
+def send_key():
+    logger.debug("send_key() starts")
+    data = read_key()
+    logger.debug("send_key() key read: %s", data)
+    send_auth_command(None, "private-key {}".format(data))
+    logger.debug("send_auth_command() finished")
+
+
+def get_host(host_id, auth_data):
+    url = urlparse.urljoin("https://" + os.environ.get("OVIRT_FQDN", DEFAULT_API_HOST),
+                           "/ovirt-engine/api/hosts/{}".format(urllib.quote(host_id)))
+
+    q = Request(url)
+    q.add_header("Authorization", auth_data)
+    q.add_header("Accept", "application/json")
+
+    code = 0
+    host = None
+    try:
+        logger.debug("oVirt: requesting host: %s", url)
+        r = urlopen(q, cafile=OVIRT_CA)
+        
+        logger.debug("Data received")
+        code = r.getcode()
+        logger.debug("code: %s", code)
+        obj = json.loads(r.read())
+        logger.debug("object parsed: %s", json.dumps(obj))
+        host = obj.get("address")
+        ssh = obj.get("ssh", {})
+        port = ssh.get("port")
+        user = obj.get("username")
+        if host:
+            if port and port != "0":
+                host = "{}:{}".format(host, port)
+            if not user:
+                user = DEFAULT_USER
+            host = "{}@{}".format(user, host)
+        else:
+            sys.stderr.write("Got invalid data: no host_name field")
+    except URLError, err:
+        if hasattr(err, "code"):
+            code = err.code
+
+        if code != 404 and code != 401:
+            sys.stderr.write("Got unexpected error {}".format(err))
+    except ValueError:
+        sys.stderr.write("Got invalid data: invalid json")
+
+    return code, host
+
+def main(args):
+    if len(args) != 2:
+        usage()
+
+    logger.debug("cockpit-ovirt-auth starts")
+    send_auth_command ("*", None)
+    logger.debug("auth command sent")
+    try:
+        resp = read_auth_reply()
+    except ValueError, e:
+        send_problem_init ("internal-error", str(e), {})
+        raise
+
+    logger.debug("oVirt response received")
+    code, host = get_host(args[1], resp)
+    if not host:
+        if code == 401:
+            send_problem_init("authentication-failed", "Token was not valid",
+                              { "password": "not-tried", "token": "denied" })
+        if code == 404:
+            send_problem_init("unknown-host", None, None)
+        else:
+            send_problem_init("internal-error", "Error validating auth token", None)
+        sys.exit(1)
+
+    send_key()
+
+    os.environ["COCKPIT_SSH_ALLOW_UNKNOWN"] = "1"
+    os.execlpe(COCKPIT_SSH_COMMAND, COCKPIT_SSH_COMMAND, host, os.environ)
+
+if __name__ == '__main__':
+    main(sys.argv)
+

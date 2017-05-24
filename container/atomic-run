@@ -1,0 +1,40 @@
+#!/bin/sh -eu
+
+# This is the startup script for cockpit-ws when run in a privileged container
+#
+# The host file system must be mounted at /host
+#
+
+echo This is atomic-run from ovirt-cockpit-sso
+
+cd /
+PATH="/bin:/sbin"
+
+# Run the install command just to be sure
+/container/atomic-install || exit $?
+
+set +x
+
+/bin/mount --bind /host/usr/share/pixmaps /usr/share/pixmaps
+/bin/mount --bind /host/var /var
+/bin/mount --bind /host/etc/ssh /etc/ssh
+
+# And run cockpit-ws configured for with oVirt's SSO
+echo cockpit-ws extra args: "$@"
+
+XDG_CONFIG_DIRS=/container/config
+if [ x${OVIRT_FQDN} = x ] ; then
+    echo "Please set OVIRT_FQDN environment variable to engine's FQDN"
+    exit 1
+fi
+
+if [ ! x${OVIRT_SSO_DEBUG} = x ] ; then
+    export G_MESSAGES_DEBUG=all
+fi
+
+echo 'Engine FQDN (OVIRT_FQDN env):' "${OVIRT_FQDN}"
+/bin/sed -i "s/%%ENGINE_URL%%/http:\/\/${OVIRT_FQDN}\/ovrt-engine/g" ${XDG_CONFIG_DIRS}/cockpit/cockpit.conf
+
+export XDG_CONFIG_DIRS=/container/config
+exec /usr/bin/nsenter --net=/container/target-namespace/ns/net --uts=/container/target-namespace/ns/uts -- /usr/libexec/cockpit-ws "$@"
+
