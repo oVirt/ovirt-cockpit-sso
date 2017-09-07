@@ -33,8 +33,10 @@ if [ ! x${OVIRT_SSO_DEBUG} = x ] ; then
 fi
 
 echo 'Engine FQDN (OVIRT_FQDN env):' "${OVIRT_FQDN}"
-/bin/sed -i "s/%%ENGINE_URL%%/http:\/\/${OVIRT_FQDN}\/ovrt-engine/g" ${XDG_CONFIG_DIRS}/cockpit/cockpit.conf
+/bin/sed -i "s/%%ENGINE_URL%%/http:\/\/${OVIRT_FQDN}\/ovirt-engine/g" ${XDG_CONFIG_DIRS}/cockpit/cockpit.conf
+/bin/sed -i "s/%%INSTALL_DIR%%/\container/g" ${XDG_CONFIG_DIRS}/cockpit/cockpit.conf
 
 export XDG_CONFIG_DIRS=/container/config
+export ROOT_DIR_PREFIX=/host
 exec /usr/bin/nsenter --net=/container/target-namespace/ns/net --uts=/container/target-namespace/ns/uts -- /usr/libexec/cockpit-ws "$@"
 

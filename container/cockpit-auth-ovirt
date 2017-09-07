@@ -12,17 +12,17 @@ import logging
 logging.basicConfig()
 logger = logging.getLogger("cockpit-auth-ovirt")
 
-logger.setLevel(logging.DEBUG)
-
 try:
     from urllib.request import Request, URLError, urlopen
 except:
     from urllib2 import Request, URLError, urlopen
 
-KEY_FILE = "/host/etc/pki/ovirt-engine/keys/engine_id_rsa"
-OVIRT_CA = "/host/etc/pki/ovirt-engine/ca.pem"
-DEFAULT_API_HOST = "set_OVIRT_FQDN"
-COCKPIT_SSH_COMMAND = "/host/usr/libexec/cockpit-ssh"
+ROOT_DIR_PREFIX = os.environ.get("ROOT_DIR_PREFIX", "") # "/host" for container or empty otherwise
+
+KEY_FILE = "{0}/etc/pki/ovirt-engine/keys/engine_id_rsa".format(ROOT_DIR_PREFIX)
+OVIRT_CA = "{0}/etc/pki/ovirt-engine/ca.pem".format(ROOT_DIR_PREFIX)
+COCKPIT_SSH_COMMAND = "{0}/usr/libexec/cockpit-ssh".format(ROOT_DIR_PREFIX)
+DEFAULT_API_HOST = "localhost"  # if OVIRT_FQDN env variable is not set
 
 # Hard coding the user here, if this is no good
 # we can have it prompt for the user.
@@ -109,7 +109,7 @@ def read_key():
     # RSA header is supported only
     # unsupported fingerprints etc. are removed from the beginning
     with open(KEY_FILE, 'r') as fp:
-	while not '-----BEGIN' in fp.next():
+        while not '-----BEGIN' in fp.next():
             pass
         data = "-----BEGIN RSA PRIVATE KEY-----\n"
         for line in fp:
