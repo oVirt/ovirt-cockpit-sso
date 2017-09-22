@@ -5,7 +5,8 @@ Author=Marek Libra
 [Service]
 Restart=always
 ExecStart=OVIRT_FQDN=$(hostname -f) XDG_CONFIG_DIRS=/usr/share/ovirt-cockpit-sso/config /usr/libexec/cockpit-ws --port=9000
-ExecStop=echo todo kill cockpit-ws
+User=ovirt
+Group=ovirt
 
 [Install]
 WantedBy=multi-user.target
