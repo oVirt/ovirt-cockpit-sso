@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 import os
 import sys
-import socket
-import resource
 import urlparse
 import urllib
 import json
@@ -17,15 +15,20 @@ try:
 except:
     from urllib2 import Request, URLError, urlopen
 
+import subprocess
+
+DEFAULT_API_HOST = "localhost"  # if OVIRT_FQDN env variable is not set
+OVIRT_FQDN = os.environ.get("OVIRT_FQDN", DEFAULT_API_HOST)
+
 ROOT_DIR_PREFIX = os.environ.get("ROOT_DIR_PREFIX", "") # "/host" for container or empty otherwise
 
-KEY_FILE = "{0}/etc/pki/ovirt-engine/keys/engine_id_rsa".format(ROOT_DIR_PREFIX)
-OVIRT_CA = "{0}/etc/pki/ovirt-engine/ca.pem".format(ROOT_DIR_PREFIX)
+OVIRT_CA_FILE = "{0}/usr/share/ovirt-cockpit-sso/ca.pem".format(ROOT_DIR_PREFIX) # pre-loaded content of https://[FQDN]/ovirt-engine/services/pki-resource?resource=ca-certificate&format=X509-PEM-CA
 COCKPIT_SSH_COMMAND = "{0}/usr/libexec/cockpit-ssh".format(ROOT_DIR_PREFIX)
-DEFAULT_API_HOST = "localhost"  # if OVIRT_FQDN env variable is not set
 
-# Hard coding the user here, if this is no good
-# we can have it prompt for the user.
+ENGINE_P12 = "{0}/etc/pki/ovirt-engine/keys/engine.p12".format(ROOT_DIR_PREFIX)
+PKI_PASSWORD = "mypass" # TODO: read it from /etc/ovirt-engine/engine.conf.d/10-setup-pki.conf as ENGINE_PKI_ENGINE_STORE_PASSWORD
+KEY_GEN_SH = "{0}/usr/share/ovirt-cockpit-sso/keygen.sh".format(ROOT_DIR_PREFIX)
+
 DEFAULT_USER = "root"
 
 def usage():
@@ -105,28 +108,23 @@ def read_auth_reply():
     return response
 
 def read_key():
-    data = ""
+    # generate private key from .p12 file
+    #
     # RSA header is supported only
     # unsupported fingerprints etc. are removed from the beginning
-    with open(KEY_FILE, 'r') as fp:
-        while not '-----BEGIN' in fp.next():
-            pass
-        data = "-----BEGIN RSA PRIVATE KEY-----\n"
-        for line in fp:
-            data += line.replace("-----END PRIVATE KEY", "-----END RSA PRIVATE KEY")
-    return data
+    private_key = subprocess.Popen([KEY_GEN_SH, ENGINE_P12, PKI_PASSWORD], stdout=subprocess.PIPE)
+    return private_key.communicate()[0]
 
 def send_key():
     logger.debug("send_key() starts")
     data = read_key()
-    logger.debug("send_key() key read: %s", data)
+    logger.debug("send_key() key read: %s", data)  # TODO: remove this!!!
     send_auth_command(None, "private-key {}".format(data))
     logger.debug("send_auth_command() finished")
 
 
 def get_host(host_id, auth_data):
-    url = urlparse.urljoin("https://" + os.environ.get("OVIRT_FQDN", DEFAULT_API_HOST),
-                           "/ovirt-engine/api/hosts/{}".format(urllib.quote(host_id)))
+    url = urlparse.urljoin("https://{0}".format(OVIRT_FQDN), "/ovirt-engine/api/hosts/{}".format(urllib.quote(host_id)))
 
     q = Request(url)
     q.add_header("Authorization", auth_data)
@@ -136,7 +134,7 @@ def get_host(host_id, auth_data):
     host = None
     try:
         logger.debug("oVirt: requesting host: %s", url)
-        r = urlopen(q, cafile=OVIRT_CA)
+        r = urlopen(q, cafile=OVIRT_CA_FILE)
         
         logger.debug("Data received")
         code = r.getcode()
