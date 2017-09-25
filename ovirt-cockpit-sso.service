@@ -1,10 +1,10 @@
 [Unit]
 Description=oVirt-Cockpit SSO service
-Author=Marek Libra
 
 [Service]
 Restart=always
-ExecStart=OVIRT_FQDN=$(hostname -f) XDG_CONFIG_DIRS=/usr/share/ovirt-cockpit-sso/config /usr/libexec/cockpit-ws --port=9000
+ExecStartPre=/usr/sbin/remotectl certificate --ensure --user=ovirt --group=ovirt --selinux-type=etc_t
+ExecStart=/usr/share/ovirt-cockpit-sso/start.sh
 User=ovirt
 Group=ovirt
 

@@ -32,12 +32,15 @@ tar -xzf %{SOURCE0}
 
 %install
 mkdir -p %{build_root_dir}/config/cockpit
+mkdir -p %{buildroot}%{_usr}/lib/systemd/system/
+
 cp container/config/cockpit/cockpit.conf %{build_root_dir}/config/cockpit/.
 
 cp container/cockpit-auth-ovirt %{build_root_dir}/.
 cp container/keygen.sh %{build_root_dir}/.
+cp start.sh %{build_root_dir}/.
 cp ovirt-cockpit-sso.xml %{build_root_dir}/.
-cp ovirt-cockpit-sso.service %{_usr}/lib/systemd/system/.
+cp ovirt-cockpit-sso.service %{buildroot}%{_usr}/lib/systemd/system/.
 
 %post
 HOSTNAME=$(hostname -f)
@@ -48,7 +51,7 @@ echo Post-installation configuration of %{name} - setting engine FQDN to: ${HOST
 /bin/sed -i "s/\%\%INSTALL_DIR\%\%/${ROOT_DIR}/g" %{app_root_dir}/config/cockpit/cockpit.conf
 /bin/ln -s %{_sysconfdir}/cockpit/ws-certs.d %{app_root_dir}/config/cockpit/ws-certs.d
 
-echo configuring firewall for ovirt-cockpit-sso service (accept 9000/tcp)
+echo configuring firewall for ovirt-cockpit-sso service - accept 9000/tcp
 /bin/firewall-cmd --permanent --zone=public --new-service-from-file=%{app_root_dir}/ovirt-cockpit-sso.xml
 
 # engine's ca.pem can be retrieved via 'https://[FQDN]/ovirt-engine/services/pki-resource?resource=ca-certificate&format=X509-PEM-CA'
@@ -60,6 +63,7 @@ chown ovirt %{app_root_dir}/ca.pem
 %preun
 rm %{app_root_dir}/config/cockpit/ws-certs.d
 rm %{app_root_dir}/ca.pem
+firewall-cmd --permanent --zone=public --delete-service=ovirt-cockpit-sso
 
 %files
 %doc README.md 
@@ -67,6 +71,7 @@ rm %{app_root_dir}/ca.pem
 %{app_root_dir}/config/cockpit/cockpit.conf
 %{app_root_dir}/cockpit-auth-ovirt
 %{app_root_dir}/keygen.sh
+%{app_root_dir}/start.sh
 %{app_root_dir}/ovirt-cockpit-sso.xml
 %{_usr}/lib/systemd/system/ovirt-cockpit-sso.service
 

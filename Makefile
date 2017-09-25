@@ -26,8 +26,12 @@ RPMBUILD_ARGS += $(if $(RELEASE_SUFFIX), --define="release_suffix $$RELEASE_SUFF
 
 SOURCES = \
 	container/cockpit-auth-ovirt \
+	container/keygen.sh \
 	container/config/cockpit/cockpit.conf \
 	ovirt-cockpit-sso.spec \
+	ovirt-cockpit-sso.xml \
+	ovirt-cockpit-sso.service \
+	start.sh \
 	LICENSE \
 	README.md
 
