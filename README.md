@@ -1,38 +1,31 @@
 
 # oVirt-Cockpit SSO
 
-Provides cockpit-ws service configured to handle SSO from oVirts Administration Portal to Cockpit running on an oVirt host.
+Provides `cockpit-ws` service configured to handle SSO from oVirt's Administration Portal to Cockpit running on an oVirt host.
 
-Packed as either ``rpm`` or ``docker image``.
+Distributed either as ``rpm`` or ``docker image`` (experimental).
 
 Please note, the provided ``docker image`` is based on the Cockpit-Container project and is so far **experimental only** and work-in-progress.
 
 ## Instructions for rpm installation
-The `ovirt-cockpit-sso.rpm` is meant to be installed on an oVirt engine machine.
+The `ovirt-cockpit-sso.rpm` requires `ovirt-engine` package.
 
-Required cockpit version: >140
+Requires `cockpit version >140`.
 
 Verified against ovirt-engine 4.2.
 
-Engine's hostname must be properly set (see `hostname -f`) before `rpm -i`.
+Engine's hostname must be properly set (see `hostname -f`) before `rpm -i` is invoked.
 
-**TODO:** yum epository
+**TODO:** setup yum repository
 
-To install:
+### To install:
 ```
-dnf install ovirt-cockpit-sso
+# dnf install ovirt-cockpit-sso
+# systemctl enable ovirt-cockpit-sso
+# systemctl start ovirt-cockpit-sso
 ```
 
-
-## Instructions for docker
-**Experimental only**
-
-On the oVirt engine machine:
-
-- allow port 9000
-- ``docker run -v /:/host --rm --privileged -e "OVIRT_FQDN=$(hostname -f)" mareklibra/ovirt-cockpit-sso:latest``
-
-## To try
+### To try
 
 - Get the oVirt SSO access token, i.e. via:
 
@@ -48,12 +41,26 @@ curl -v -i --insecure --header "Accept: application/xml" --header "Filter: true"
 
 - in browser, enjoy ovirt-cockpit SSO by:
 ```
-http://[OVIRT_FQDN]:9000/=[HOST_UUID]#access_token=[OVIRT_SSO_TOKEN]
+https://[ENGINE_FQDN]:9000/=[OVIRT_HOST_UUID]/machines#access_token=[VALID_OVIRT_ACCESS_TOKEN]
 ```
 
 If everything is ok, the browser shall end up with open Cockpit session for the `root` user on the specified host machine. 
 
-**Not yet fully implemented:** Eventually, log into oVirt's Administration Portal, find particular host and select `Web Console` in the right-click menu to open host's Cockpit session using SSO.
+## Docker
+**Experimental only**, might be broken in favor of the rpm installation 
+
+On the oVirt engine machine:
+
+- allow port 9000
+- ``docker run -v /:/host --rm --privileged -e "OVIRT_FQDN=$(hostname -f)" mareklibra/ovirt-cockpit-sso:latest``
+
+## To Be Done
+- Fix firewall: the 9000/tcp shall be open in the course of rpm installation
+- Main use case (Web Admin part is missing): 
+  - log into oVirt's Administration Portal (available for `admin` users only)
+  - find particular host and select `Web Console` in the right-click menu
+  - host's Cockpit session is opened while no password needs to be entered
+
 
 ## More Info
 
