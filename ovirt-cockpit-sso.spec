@@ -1,8 +1,5 @@
 %global product oVirt
 
-## %global use_rhev %( test -z @RHEV@ && echo 1 || echo 0)
-## %define debug_package %{nil}
-
 Name:           ovirt-cockpit-sso
 Version:        0.0.1
 Release:        1
@@ -51,8 +48,9 @@ echo Post-installation configuration of %{name} - setting engine FQDN to: ${HOST
 /bin/sed -i "s/\%\%INSTALL_DIR\%\%/${ROOT_DIR}/g" %{app_root_dir}/config/cockpit/cockpit.conf
 /bin/ln -s %{_sysconfdir}/cockpit/ws-certs.d %{app_root_dir}/config/cockpit/ws-certs.d
 
-echo configuring firewall for ovirt-cockpit-sso service - accept 9000/tcp
+echo configuring firewall for ovirt-cockpit-sso service - accept 9986/tcp
 /bin/firewall-cmd --permanent --zone=public --new-service-from-file=%{app_root_dir}/ovirt-cockpit-sso.xml
+/bin/firewall-cmd --reload
 
 # engine's ca.pem can be retrieved via 'https://[FQDN]/ovirt-engine/services/pki-resource?resource=ca-certificate&format=X509-PEM-CA'
 # without any authorization so there's no harm in making a copy here to speed up processing later
@@ -63,7 +61,8 @@ chown ovirt %{app_root_dir}/ca.pem
 %preun
 rm %{app_root_dir}/config/cockpit/ws-certs.d
 rm %{app_root_dir}/ca.pem
-firewall-cmd --permanent --zone=public --delete-service=ovirt-cockpit-sso
+/bin/firewall-cmd --permanent --zone=public --delete-service=ovirt-cockpit-sso
+/bin/firewall-cmd --reload
 
 %files
 %doc README.md 
@@ -78,4 +77,3 @@ firewall-cmd --permanent --zone=public --delete-service=ovirt-cockpit-sso
 %changelog
 * Wed Sep 06 2017 Marek Libra <mlibra@redhat.com> - 0.0.1
 - Initial version
-

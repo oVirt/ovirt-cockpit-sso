@@ -2,5 +2,5 @@
 <service>
     <short>ovirt-cockpit-sso</short>
     <description>oVirt-Cockpit SSO service</description>
-    <port protocol="tcp" port="9000"/>
+    <port protocol="tcp" port="9986"/>
 </service>

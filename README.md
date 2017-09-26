@@ -41,7 +41,7 @@ curl -v -i --insecure --header "Accept: application/xml" --header "Filter: true"
 
 - in browser, enjoy ovirt-cockpit SSO by:
 ```
-https://[ENGINE_FQDN]:9000/=[OVIRT_HOST_UUID]/machines#access_token=[VALID_OVIRT_ACCESS_TOKEN]
+https://[ENGINE_FQDN]:9986/=[OVIRT_HOST_UUID]/machines#access_token=[VALID_OVIRT_ACCESS_TOKEN]
 ```
 
 If everything is ok, the browser shall end up with open Cockpit session for the `root` user on the specified host machine. 
@@ -51,11 +51,10 @@ If everything is ok, the browser shall end up with open Cockpit session for the 
 
 On the oVirt engine machine:
 
-- allow port 9000
+- allow port 9986
 - ``docker run -v /:/host --rm --privileged -e "OVIRT_FQDN=$(hostname -f)" mareklibra/ovirt-cockpit-sso:latest``
 
 ## To Be Done
-- Fix firewall: the 9000/tcp shall be open in the course of rpm installation
 - Main use case (Web Admin part is missing): 
   - log into oVirt's Administration Portal (available for `admin` users only)
   - find particular host and select `Web Console` in the right-click menu
