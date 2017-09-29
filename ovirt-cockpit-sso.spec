@@ -31,6 +31,9 @@ tar -xzf %{SOURCE0}
 mkdir -p %{build_root_dir}/config/cockpit
 mkdir -p %{buildroot}%{_usr}/lib/systemd/system/
 
+mkdir -p %{buildroot}/var/run/ovirt-cockpit-sso
+chown ovirt %{buildroot}/var/run/ovirt-cockpit-sso
+
 cp container/config/cockpit/cockpit.conf %{build_root_dir}/config/cockpit/.
 
 cp container/cockpit-auth-ovirt %{build_root_dir}/.
@@ -73,6 +76,7 @@ rm %{app_root_dir}/ca.pem
 %{app_root_dir}/start.sh
 %{app_root_dir}/ovirt-cockpit-sso.xml
 %{_usr}/lib/systemd/system/ovirt-cockpit-sso.service
+/var/run/ovirt-cockpit-sso
 
 %changelog
 * Wed Sep 06 2017 Marek Libra <mlibra@redhat.com> - 0.0.1
