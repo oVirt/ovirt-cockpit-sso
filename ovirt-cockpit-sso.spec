@@ -60,7 +60,7 @@ echo configuring firewall for ovirt-cockpit-sso service - accept 9986/tcp
 /bin/cp %{_sysconfdir}/pki/ovirt-engine/ca.pem %{app_root_dir}/ca.pem
 chown ovirt %{app_root_dir}/ca.pem
 
-chown ovirt %{buildroot}/var/run/ovirt-cockpit-sso
+chown ovirt /var/run/ovirt-cockpit-sso
 
 %preun
 rm %{app_root_dir}/config/cockpit/ws-certs.d
