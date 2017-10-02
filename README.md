@@ -16,10 +16,11 @@ Verified against ovirt-engine 4.2.
 
 Engine's hostname must be properly set (see `hostname -f`) before `rpm -i` is invoked.
 
-**TODO:** setup yum repository
+RPM builds can be found in [Fedora Copr ovirt-cockpit-sso](https://copr.fedorainfracloud.org/coprs/mlibra/ovirt-cockpit-sso/)
 
 ### To install:
 ```
+# dnf copr enable mlibra/ovirt-cockpit-sso # optional 
 # dnf install ovirt-cockpit-sso
 # systemctl enable ovirt-cockpit-sso
 # systemctl start ovirt-cockpit-sso
