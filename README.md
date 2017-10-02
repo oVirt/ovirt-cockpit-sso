@@ -18,12 +18,18 @@ Engine's hostname must be properly set (see `hostname -f`) before `rpm -i` is in
 
 RPM builds can be found in [Fedora Copr ovirt-cockpit-sso](https://copr.fedorainfracloud.org/coprs/mlibra/ovirt-cockpit-sso/)
 
+Please download RPMs from [Project yum repository](http://people.redhat.com/mlibra/repos/ovirt-cockpit-sso/).
+
 ### To install:
 ```
-# dnf copr enable mlibra/ovirt-cockpit-sso # optional 
 # dnf install ovirt-cockpit-sso
 # systemctl enable ovirt-cockpit-sso
 # systemctl start ovirt-cockpit-sso
+```
+
+RPM installation without adding yum repository (please update version numbers):
+```
+# dnf install http://people.redhat.com/mlibra/repos/ovirt-cockpit-sso/fedora-27-x86_64/ovirt-cockpit-sso-0.0.1-1.noarch.rpm
 ```
 
 ### To try
