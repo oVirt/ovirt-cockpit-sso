@@ -13,8 +13,8 @@ Source0:        ovirt-cockpit-sso-%{version}.tar.gz
 
 BuildArch: noarch
 
-# None of 4.2 features are reuiqred by this package but "Web Console" link is first introduced here
-Requires: ovirt-engine > 4.2
+# None of the 4.2 features are reuiqred by this package but "Host Console" link is first introduced here
+Requires: ovirt-engine >= 4.2
 
 Requires: cockpit-ws >= 140
 Requires: cockpit-dashboard >= 140
@@ -32,7 +32,6 @@ mkdir -p %{build_root_dir}/config/cockpit
 mkdir -p %{buildroot}%{_usr}/lib/systemd/system/
 
 mkdir -p %{buildroot}/var/run/ovirt-cockpit-sso
-chown ovirt %{buildroot}/var/run/ovirt-cockpit-sso
 
 cp container/config/cockpit/cockpit.conf %{build_root_dir}/config/cockpit/.
 
@@ -60,6 +59,8 @@ echo configuring firewall for ovirt-cockpit-sso service - accept 9986/tcp
 # TODO: proper location of CA file is configured in /etc/ovirt-engine/engine.conf.d/10-setup-pki.conf : ENGINE_PKI_CA
 /bin/cp %{_sysconfdir}/pki/ovirt-engine/ca.pem %{app_root_dir}/ca.pem
 chown ovirt %{app_root_dir}/ca.pem
+
+chown ovirt %{buildroot}/var/run/ovirt-cockpit-sso
 
 %preun
 rm %{app_root_dir}/config/cockpit/ws-certs.d
