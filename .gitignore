@@ -1,0 +1,5 @@
+tmp.repos
+.idea
+*.tar.gz
+ovirt-cockpit-sso.iml
+
