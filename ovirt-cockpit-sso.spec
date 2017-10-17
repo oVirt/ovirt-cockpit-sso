@@ -32,8 +32,6 @@ tar -xzf %{SOURCE0}
 mkdir -p %{build_root_dir}/config/cockpit
 mkdir -p %{buildroot}%{_usr}/lib/systemd/system/
 
-mkdir -p %{buildroot}/var/run/ovirt-cockpit-sso
-
 cp container/config/cockpit/cockpit.conf %{build_root_dir}/config/cockpit/.
 
 cp container/cockpit-auth-ovirt %{build_root_dir}/.
@@ -71,9 +69,6 @@ esac
 /bin/cp %{_sysconfdir}/pki/ovirt-engine/ca.pem %{app_root_dir}/ca.pem
 chown ovirt %{app_root_dir}/ca.pem
 
-chown ovirt /var/run/ovirt-cockpit-sso
-
-
 %postun
 case "$1" in
   0)
@@ -81,6 +76,7 @@ case "$1" in
     rm %{app_root_dir}/config/cockpit/ws-certs.d
     rm %{app_root_dir}/ca.pem
 
+    ## TODO: this is not working but would be better approach:
     ## /bin/firewall-cmd --permanent --zone=public --delete-service=ovirt-cockpit-sso
     /bin/firewall-cmd --permanent --remove-port 9986/tcp >> %{logfile} || true
     /bin/firewall-cmd --reload >> %{logfile}
@@ -100,7 +96,6 @@ esac
 %{app_root_dir}/start.sh
 %{app_root_dir}/ovirt-cockpit-sso.xml
 %{_usr}/lib/systemd/system/ovirt-cockpit-sso.service
-/var/run/ovirt-cockpit-sso
 
 %changelog
 * Wed Sep 06 2017 Marek Libra <mlibra@redhat.com> - 0.0.1
