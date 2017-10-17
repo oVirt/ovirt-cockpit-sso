@@ -46,16 +46,24 @@ cp ovirt-cockpit-sso.service %{buildroot}%{_usr}/lib/systemd/system/.
 HOSTNAME=$(hostname -f)
 ROOT_DIR=$(echo %{app_root_dir} | sed -e 's/\\/\\\\/g; s/\//\\\//g; s/&/\\\&/g')
 
-echo Post-installation configuration of %{name} - setting engine FQDN to: ${HOSTNAME} >> %{logfile}
+case "$1" in
+  1)
+    echo configuring firewall for ovirt-cockpit-sso service - accept 9986/tcp > %{logfile}
+    echo Post-installation configuration of %{name} - setting engine FQDN to: ${HOSTNAME} >> %{logfile}
+
+    ## /bin/firewall-cmd --permanent --zone=public --new-service-from-file=%{app_root_dir}/ovirt-cockpit-sso.xml
+    /bin/firewall-cmd --permanent --add-port 9986/tcp >> %{logfile}
+    /bin/firewall-cmd --reload >> %{logfile}
+  ;;
+  2)
+    ## This is an upgrade.
+  ;;
+esac
 
 /bin/sed -i "s/\%\%ENGINE_URL\%\%/https:\/\/${HOSTNAME}\/ovirt-engine/g" %{app_root_dir}/config/cockpit/cockpit.conf
 /bin/sed -i "s/\%\%INSTALL_DIR\%\%/${ROOT_DIR}/g" %{app_root_dir}/config/cockpit/cockpit.conf
-/bin/ln -s %{_sysconfdir}/cockpit/ws-certs.d %{app_root_dir}/config/cockpit/ws-certs.d
 
-echo configuring firewall for ovirt-cockpit-sso service - accept 9986/tcp > %{logfile}
-## /bin/firewall-cmd --permanent --zone=public --new-service-from-file=%{app_root_dir}/ovirt-cockpit-sso.xml
-/bin/firewall-cmd --permanent --add-port 9986/tcp >> %{logfile}
-/bin/firewall-cmd --reload >> %{logfile}
+/bin/ln -s %{_sysconfdir}/cockpit/ws-certs.d %{app_root_dir}/config/cockpit/ws-certs.d || true
 
 ## engine's ca.pem can be retrieved via 'https://[FQDN]/ovirt-engine/services/pki-resource?resource=ca-certificate&format=X509-PEM-CA'
 ## without any authorization so there's no harm in making a copy here to speed up processing later
@@ -65,13 +73,23 @@ chown ovirt %{app_root_dir}/ca.pem
 
 chown ovirt /var/run/ovirt-cockpit-sso
 
-%preun
-rm %{app_root_dir}/config/cockpit/ws-certs.d
-rm %{app_root_dir}/ca.pem
 
-## /bin/firewall-cmd --permanent --zone=public --delete-service=ovirt-cockpit-sso
-/bin/firewall-cmd --permanent --remove-port 9986/tcp >> %{logfile} || true
-/bin/firewall-cmd --reload >> %{logfile}
+%postun
+case "$1" in
+  0)
+    ## package is being removed
+    rm %{app_root_dir}/config/cockpit/ws-certs.d
+    rm %{app_root_dir}/ca.pem
+
+    ## /bin/firewall-cmd --permanent --zone=public --delete-service=ovirt-cockpit-sso
+    /bin/firewall-cmd --permanent --remove-port 9986/tcp >> %{logfile} || true
+    /bin/firewall-cmd --reload >> %{logfile}
+  ;;
+  1)
+     ## Package is being upgraded. Do nothing.
+    :
+  ;;
+esac
 
 %files
 %doc README.md 
