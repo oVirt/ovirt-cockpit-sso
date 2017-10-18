@@ -1,8 +1,8 @@
 %global product oVirt
 
 Name:           ovirt-cockpit-sso
-Version:        0.0.1
-Release:        4%{?dist}
+Version:        0.0.2
+Release:        1%{?dist}
 Summary:        Provides SSO from oVirt Administration Portal to Cockpit running on an oVirt host.
 License:        ASL 2.0
 URL:            https://github.com/mareklibra/ovirt-cockpit-sso
@@ -98,5 +98,8 @@ esac
 %{_usr}/lib/systemd/system/ovirt-cockpit-sso.service
 
 %changelog
+* Wed Oct 18 2017 Marek Libra <mlibra@redhat.com> - 0.0.2
+- Fixes for package update
+
 * Wed Sep 06 2017 Marek Libra <mlibra@redhat.com> - 0.0.1
 - Initial version
