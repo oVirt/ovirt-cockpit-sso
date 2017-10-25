@@ -72,6 +72,6 @@ On the oVirt engine machine:
 
  * Based on [Cockpit/ws docker image](https://hub.docker.com/r/cockpit/ws/)
  * which is built using [Cockpit-Container project](https://github.com/cockpit-project/cockpit-container)
- * [oVirt project](www.ovirt.org)
+ * [oVirt project](http://www.ovirt.org)
  * [Cockpit Project](https://cockpit-project.org)
  * [Cockpit Development](https://github.com/cockpit-project/cockpit)
