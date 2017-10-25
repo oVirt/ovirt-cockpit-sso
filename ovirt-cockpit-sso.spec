@@ -14,11 +14,20 @@ Source0:        ovirt-cockpit-sso-%{version}.tar.gz
 
 BuildArch: noarch
 
-# None of the 4.2 features are reuiqred by this package but "Host Console" link is first introduced here
+# None of the 4.2 features are reuiqred by this package but "Host Console" link is introduced here for the first time
 Requires: ovirt-engine >= 4.2
 
+## TODO: increase to 140 once RHEL 7.5 is released
+## In fact, cockpit 140 is required but this is eased to allow smooth deployment for testing in the meantime
+## cockpit 140 is farther enforced in start.sh which is called by systemd
+%if 0%{?fedora} >= 26
+## fedora >26 is fine
 Requires: cockpit-ws >= 140
 Requires: cockpit-dashboard >= 140
+%else
+Requires: cockpit-ws >= 138
+Requires: cockpit-dashboard >= 138
+%endif
 
 %description
 This package sets cockpit-ws service (see cockpit-project.org) to provide SSO (Single Sign On) from oVirt's Administration Portal to Cockpit running on an oVirt's host machine.
