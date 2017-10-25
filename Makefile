@@ -16,7 +16,7 @@ SHELL := /bin/bash
 
 RPMBUILD = rpmbuild
 PACKAGE_TARNAME = ovirt-cockpit-sso
-PACKAGE_VERSION = 0.0.2
+PACKAGE_VERSION = 0.0.3
 TGZ = $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz
 
 TMPREPOS = tmp.repos
