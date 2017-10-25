@@ -7,6 +7,11 @@ Distributed either as ``rpm`` or ``docker image`` (experimental).
 
 Please note, the provided ``docker image`` is based on the Cockpit-Container project and is so far **experimental only** and work-in-progress.
 
+## Main use case: 
+  - log into oVirt's Administration Portal (available for `admin` users only)
+  - find particular host and click `Host Console`
+  - host's Cockpit session is opened while no password needs to be entered
+
 ## Instructions for rpm installation
 The `ovirt-cockpit-sso.rpm` requires `ovirt-engine` package.
 
@@ -60,12 +65,6 @@ On the oVirt engine machine:
 
 - allow port 9986
 - ``docker run -v /:/host --rm --privileged -e "OVIRT_FQDN=$(hostname -f)" mareklibra/ovirt-cockpit-sso:latest``
-
-## To Be Done
-- Main use case (Web Admin part is missing): 
-  - log into oVirt's Administration Portal (available for `admin` users only)
-  - find particular host and select `Web Console` in the right-click menu
-  - host's Cockpit session is opened while no password needs to be entered
 
 
 ## More Info
