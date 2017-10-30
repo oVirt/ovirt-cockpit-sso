@@ -1,0 +1,1 @@
+build-artifacts-manual.sh
