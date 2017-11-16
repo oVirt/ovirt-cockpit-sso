@@ -17,7 +17,8 @@ SHELL := /bin/bash
 RPMBUILD = rpmbuild
 PACKAGE_TARNAME = ovirt-cockpit-sso
 PACKAGE_VERSION = 0.0.3
-TGZ = $(PACKAGE_TARNAME)-$(PACKAGE_VERSION).tar.gz
+PACKAGE_NAME = $(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
+TGZ = $(PACKAGE_NAME).tar.gz
 
 TMPREPOS = tmp.repos
 RPMBUILD_ARGS :=
@@ -36,11 +37,16 @@ SOURCES = \
 	README.md
 
 DISTCLEANDIRS = \
+  $(PACKAGE_NAME) \
 	$(TMPREPOS) \
   $(TGZ)
 
 dist: $(SOURCES)
-	tar -czf "$(TGZ)" $^
+	rm -rf "$(PACKAGE_NAME)"
+	mkdir "$(PACKAGE_NAME)"
+	cp -r --parents $^ "$(PACKAGE_NAME)"/
+	tar -czf "$(TGZ)" "$(PACKAGE_NAME)"
+	rm -rf "$(PACKAGE_NAME)"
 
 srpm: dist
 	rm -fr "$(TMPREPOS)"
