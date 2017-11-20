@@ -1,12 +1,10 @@
-%global product oVirt
-
 Name:           ovirt-cockpit-sso
 Version:        0.0.3
-Release:        1%{?dist}
-Summary:        Provides SSO from oVirt Administration Portal to Cockpit running on an oVirt host.
+Release:        3%{?dist}
+Summary:        Provides SSO from oVirt Administration Portal to Cockpit
 License:        ASL 2.0
-URL:            https://github.com/mareklibra/ovirt-cockpit-sso
-Source0:        ovirt-cockpit-sso-%{version}.tar.gz
+URL:            https://github.com/oVirt/ovirt-cockpit-sso
+Source0:        https://github.com/oVirt/ovirt-cockpit-sso/archive/%{name}-%{version}.tar.gz
 
 %define build_root_dir %{buildroot}%{_datadir}/%{name}
 %define app_root_dir %{_datadir}/%{name}
@@ -14,11 +12,13 @@ Source0:        ovirt-cockpit-sso-%{version}.tar.gz
 
 BuildArch: noarch
 
-# None of the 4.2 features are reuiqred by this package but "Host Console" link is introduced here for the first time
+# None of the 4.2 features are reuiqred by this package but "Host Console"
+# link is introduced here for the first time
 Requires: ovirt-engine >= 4.2
 
 ## TODO: increase to 140 once RHEL 7.5 is released
-## In fact, cockpit 140 is required but this is eased to allow smooth deployment for testing in the meantime
+## In fact, cockpit 140 is required but this is eased to allow smooth
+## deployment for testing in the meantime
 ## cockpit 140 is farther enforced in start.sh which is called by systemd
 %if 0%{?fedora} >= 26
 ## fedora >26 is fine
@@ -30,10 +30,13 @@ Requires: cockpit-dashboard >= 138
 %endif
 
 %description
-This package sets cockpit-ws service (see cockpit-project.org) to provide SSO (Single Sign On) from oVirt's Administration Portal to Cockpit running on an oVirt's host machine.
+This package sets cockpit-ws service (see cockpit-project.org) to provide
+SSO (Single Sign On) from oVirt's Administration Portal to Cockpit running
+on an oVirt's host machine.
 
 %prep
-tar -xzf %{SOURCE0}
+## x%setup -q -n %{name}-%{version}
+%setup -q
 
 %build
 
@@ -97,7 +100,7 @@ case "$1" in
 esac
 
 %files
-%doc README.md 
+%doc README.md
 %license LICENSE
 %{app_root_dir}/config/cockpit/cockpit.conf
 %{app_root_dir}/cockpit-auth-ovirt
@@ -107,6 +110,12 @@ esac
 %{_usr}/lib/systemd/system/ovirt-cockpit-sso.service
 
 %changelog
+* Thu Nov 16 2017 Marek Libra <mlibra@redhat.com> - 0.0.3-3
+- Spec file polishing
+
+* Wed Nov 15 2017 Sandro Bonazzola <sbonazzo@redhat.com> - 0.0.3-2
+- Fixing spec file for CentOS Virt SIG inclusion
+
 * Wed Oct 25 2017 Marek Libra <mlibra@redhat.com> - 0.0.3
 - Required cockpit-ws is 138 but the service is effectively
   disabled for lower than 140. So at least instlation is
