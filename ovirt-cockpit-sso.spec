@@ -12,9 +12,10 @@ Source0:        https://github.com/oVirt/ovirt-cockpit-sso/archive/%{name}-%{ver
 
 BuildArch: noarch
 
-# None of the 4.2 features are reuiqred by this package but "Host Console"
-# link is introduced here for the first time
-Requires: ovirt-engine >= 4.2
+# None of the 4.2 features are reuiqred by this package but "Host Console" link is introduced here for the first time
+# using conflicts instead of require because in CentOS Virt SIG repo we can't build ovirt-engine and the require
+# breaks repository closure
+Conflicts: ovirt-engine < 4.2
 
 ## TODO: increase to 140 once RHEL 7.5 is released
 ## In fact, cockpit 140 is required but this is eased to allow smooth
