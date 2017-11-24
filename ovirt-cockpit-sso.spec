@@ -85,8 +85,8 @@ chown ovirt %{app_root_dir}/ca.pem
 case "$1" in
   0)
     ## package is being removed
-    rm %{app_root_dir}/config/cockpit/ws-certs.d
-    rm %{app_root_dir}/ca.pem
+    rm %{app_root_dir}/config/cockpit/ws-certs.d || true
+    rm %{app_root_dir}/ca.pem || true
 
     ## TODO: this is not working but would be better approach:
     ## /bin/firewall-cmd --permanent --zone=public --delete-service=ovirt-cockpit-sso
