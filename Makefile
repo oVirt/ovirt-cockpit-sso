@@ -38,7 +38,6 @@ SOURCES = \
 	README.md
 
 DISTCLEANDIRS = \
-  $(PACKAGE_NAME) \
 	$(TMPREPOS) \
   $(TGZ)
 
@@ -64,7 +63,7 @@ rpm:  srpm
 	@echo
 
 
-distclean: $(DISTCLEANDIRS)
-	rm -rf $^
+distclean:
+	rm -rf $(DISTCLEANDIRS)
 
 # vim: ts=2
