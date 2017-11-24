@@ -7,6 +7,7 @@ User=ovirt
 Group=ovirt
 RuntimeDirectory=ovirt-cockpit-sso
 ExecStartPre=/usr/sbin/remotectl certificate --ensure --user=ovirt --group=ovirt --selinux-type=etc_t
+ExecStartPre=/bin/ln -s /etc/cockpit/ws-certs.d /usr/share/ovirt-cockpit-sso/config/cockpit/ws-certs.d || true
 ExecStart=/usr/share/ovirt-cockpit-sso/start.sh
 
 [Install]

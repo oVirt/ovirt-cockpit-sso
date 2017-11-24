@@ -35,7 +35,6 @@ SSO (Single Sign On) from oVirt's Administration Portal to Cockpit running
 on an oVirt's host machine.
 
 %prep
-## x%setup -q -n %{name}-%{version}
 %setup -q
 
 %build
@@ -72,8 +71,6 @@ esac
 
 /bin/sed -i "s/\%\%ENGINE_URL\%\%/https:\/\/${HOSTNAME}\/ovirt-engine/g" %{app_root_dir}/config/cockpit/cockpit.conf
 /bin/sed -i "s/\%\%INSTALL_DIR\%\%/${ROOT_DIR}/g" %{app_root_dir}/config/cockpit/cockpit.conf
-
-/bin/ln -s %{_sysconfdir}/cockpit/ws-certs.d %{app_root_dir}/config/cockpit/ws-certs.d || true
 
 ## engine's ca.pem can be retrieved via 'https://[FQDN]/ovirt-engine/services/pki-resource?resource=ca-certificate&format=X509-PEM-CA'
 ## without any authorization so there's no harm in making a copy here to speed up processing later
