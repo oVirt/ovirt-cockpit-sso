@@ -33,6 +33,7 @@ SOURCES = \
 	ovirt-cockpit-sso.xml \
 	ovirt-cockpit-sso.service \
 	start.sh \
+	prestart.sh \
 	LICENSE \
 	README.md
 
