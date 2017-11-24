@@ -2,8 +2,8 @@
 
 APP_ROOT="/usr/share/ovirt-cockpit-sso"
 
-# ensure the cockpit's WS certificate is present and accessible by ovirt:ovirt user:group
-/usr/sbin/remotectl certificate --ensure --user=ovirt --group=ovirt --selinux-type=etc_t
+# ensure the cockpit's WS certificate is present and accessible by ovirt:cockpit-ws user:group (see .service file)
+/usr/sbin/remotectl certificate --ensure --group=cockpit-ws --selinux-type=etc_t
 
 # link cockpit's WS certificate to ovirt-cockpit-sso config dir which will be passed to the cockpit-ws later
 /bin/ln -s /etc/cockpit/ws-certs.d ${APP_ROOT}/config/cockpit/ws-certs.d || true
