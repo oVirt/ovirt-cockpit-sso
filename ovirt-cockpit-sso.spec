@@ -91,6 +91,9 @@ case "$1" in
   ;;
 esac
 
+# the .service file could be changed
+systemctl daemon-reload
+
 %files
 %doc README.md
 %license LICENSE
