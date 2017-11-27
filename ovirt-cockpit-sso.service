@@ -3,10 +3,11 @@ Description=oVirt-Cockpit SSO service
 
 [Service]
 Restart=always
+PermissionsStartOnly=true
 User=ovirt
-Group=ovirt
+Group=cockpit-ws
 RuntimeDirectory=ovirt-cockpit-sso
-ExecStartPre=/usr/sbin/remotectl certificate --ensure --user=ovirt --group=ovirt --selinux-type=etc_t
+ExecStartPre=/usr/share/ovirt-cockpit-sso/prestart.sh
 ExecStart=/usr/share/ovirt-cockpit-sso/start.sh
 
 [Install]

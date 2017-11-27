@@ -33,11 +33,11 @@ SOURCES = \
 	ovirt-cockpit-sso.xml \
 	ovirt-cockpit-sso.service \
 	start.sh \
+	prestart.sh \
 	LICENSE \
 	README.md
 
 DISTCLEANDIRS = \
-  $(PACKAGE_NAME) \
 	$(TMPREPOS) \
   $(TGZ)
 
@@ -63,7 +63,7 @@ rpm:  srpm
 	@echo
 
 
-distclean: $(DISTCLEANDIRS)
-	rm -rf $^
+distclean:
+	rm -rf $(DISTCLEANDIRS)
 
 # vim: ts=2
