@@ -118,7 +118,6 @@ def read_key():
 def send_key():
     logger.debug("send_key() starts")
     data = read_key()
-    logger.debug("send_key() key read: %s", data)  # TODO: remove this!!!
     send_auth_command(None, "private-key {}".format(data))
     logger.debug("send_auth_command() finished")
 
