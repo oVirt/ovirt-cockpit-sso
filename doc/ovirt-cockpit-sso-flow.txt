@@ -1,0 +1,39 @@
+This documment describes the Single Sign On flow, executed from oVirt Web Admin Portal to cockpit-machines-ovirt running on an oVirt host within the cluster.
+
+TL;DR: the ovirt-engine machine acts as a proxy between browser and the desired host. Same mechanism as for the "multi-machine Cockpit management" is used for system-level authentication to the host, just tuned via custom configuration.
+
+The "cockpit-ws" service, configured just for the purpose of the ovirt-cockpit SSO [3], is running on the ovirt-engine machine (server managing the cluster).
+The service listens on 9986/tcp, running under ovirt:cockpit-ws user privileges. [1]
+
+In the desired flow, two different authentications are involved:
+- 1] the user logged into oVirt Web Admin Portal accesses the Cockpit on one of the cluster hosts using "root" privileges
+- 2] the Cockpit session (on the cluster host) can access oVirt API with the privileges of the user legged into Web Admin Portal
+
+To do so, the Browser sends HTTP GET request to the cockpit-ws, providing oVirt SSO token and desired host UUID as parameters [4].
+The oVirt SSO token is already generated at login to oVirt Web Admin application by ovirt-engine authentication servlets and is known to the browser application (means oVirt Web Admin Portal).
+It is desired that this token will be provided to the cockpit-machines-ovirt running on the desired host to be farther used to access the oVirt API.
+This is possible thanks to missing checks about origin when accessing the oVirt API using token, just it's expiration is verified.
+
+The cockpit-ws service uses the custom "cockpit-auth-ovirt" to perform root ssh login to the host [2].
+To verify, the user is eligible to access the host, the cockpit-auth-ovirt script makes request on oVirt API to get details about the desired host. 
+The host is identified via UUID (provided in HTTP request to cockpit-ws, see above) and the oVirt SSO token is used to authenticate to the oVirt API.
+
+If the user owning the token is eligible to access the host (means is an oVirt administrator, in other words), then the oVirt API request is successful and details (like host IP) are returned.
+If the user (token) lacks permissions, one of the HTTP failures are returned and the flow ends.
+
+So, if the user is allowed to root-access the host (by fullfiling the API request the oVirt verified authorization), the cockpit-auth-ovirt script farther performs ssh login (via libssh, not "ssh" binary) to the host using PKI certificates for password-less login (there's ovirt-engine's public key on the host set as authorized). 
+Please note, the password-less login from ovirt-engine to a host is already existing feature within the oVirt infrastructure, the public key is distributed wihtin host-deploy flow which is completely independent on the ovirt-cockpit installation.
+
+Once the root ssh session is established, the cockpit-ws acts as a proxy for farther communication.
+From now on, the flow is same as for the multi-machine Cockpit management.
+At this moment, the authentication 1] as desired above is done.
+
+For cockpit-machines-ovirt to oVirt authentication (see point 2] above), the landing Cockpit plugin on the host machine is "/machines/", as specified within [4].
+Means the plugin under "/machines" is served after successful login while HTTP GET parameters are passed through.
+Since on an oVirt host is cockpit-machines-ovirt installed and registered for the "/machines" context, the "access_token" parameter is parsed at the plugin start-up and used as Baerer token in next oVirt API communication.
+
+
+[1] https://github.com/oVirt/ovirt-cockpit-sso/blob/master/ovirt-cockpit-sso.service
+[2] https://github.com/oVirt/ovirt-cockpit-sso/blob/master/container/cockpit-auth-ovirt
+[3] https://github.com/oVirt/ovirt-cockpit-sso/blob/master/container/config/cockpit/cockpit.conf
+[4] format: https://[ENGINE_FQDN]:9986/=[OVIRT_HOST_UUID]/machines#access_token=[VALID_OVIRT_ACCESS_TOKEN]
