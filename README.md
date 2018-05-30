@@ -68,7 +68,7 @@ On the oVirt engine machine:
 
 ## Contributing
 
-High-level description of the flow can be found in [doc/ovirt-cockpit-sso-flow.txt](https://github.com/ovirt/ovirt-cockpit-sso/doc/ovirt-cockpit-sso-flow.txt).
+High-level description of the flow can be found in [doc/ovirt-cockpit-sso-flow.txt](https://github.com/oVirt/ovirt-cockpit-sso/blob/master/doc/ovirt-cockpit-sso-flow.txt).
 
 ## More Info
 
