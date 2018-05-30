@@ -66,6 +66,9 @@ On the oVirt engine machine:
 - allow port 9986
 - ``docker run -v /:/host --rm --privileged -e "OVIRT_FQDN=$(hostname -f)" mareklibra/ovirt-cockpit-sso:latest``
 
+## Contributing
+
+High-level description of the flow can be found in [doc/ovirt-cockpit-sso-flow.txt](https://github.com/ovirt/ovirt-cockpit-sso/doc/ovirt-cockpit-sso-flow.txt).
 
 ## More Info
 
