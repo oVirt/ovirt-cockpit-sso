@@ -106,6 +106,8 @@ systemctl daemon-reload
 %{app_root_dir}/ovirt-cockpit-sso.xml
 %{_usr}/lib/systemd/system/ovirt-cockpit-sso.service
 
+%config %{app_root_dir}/config/cockpit/cockpit.conf
+
 %changelog
 * Mon Nov 27 2017 Marek Libra <mlibra@redhat.com> - 0.0.4-1
 - RPM installation fixes - https://github.com/oVirt/ovirt-cockpit-sso/pull/10
