@@ -106,7 +106,7 @@ systemctl daemon-reload
 %{app_root_dir}/ovirt-cockpit-sso.xml
 %{_usr}/lib/systemd/system/ovirt-cockpit-sso.service
 
-%config %{app_root_dir}/config/cockpit/cockpit.conf
+%config %verify(not md5 size mtime) %{app_root_dir}/config/cockpit/cockpit.conf
 
 %changelog
 * Mon Aug 3 2018 Marek Libra <mlibra@redhat.com> - 0.1.0
