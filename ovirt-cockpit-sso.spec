@@ -1,5 +1,5 @@
 Name:           ovirt-cockpit-sso
-Version:        0.1.1
+Version:        0.1.2
 Release:        1%{?dist}
 Summary:        Provides SSO from oVirt Administration Portal to Cockpit
 License:        ASL 2.0
@@ -109,6 +109,9 @@ systemctl daemon-reload
 %config %verify(not md5 size mtime) %{app_root_dir}/config/cockpit/cockpit.conf
 
 %changelog
+* Thu Dec 19 2018 Ryan Barry <rbarry@redhat.com> - 0.1.2
+- Use python2 explicitly so we build on FC30
+
 * Thu Nov 29 2018 Marek Libra <mlibra@redhat.com> - 0.1.1
 - Exclude cockpit.conf from verification - https://github.com/oVirt/ovirt-cockpit-sso/pull/17
 
