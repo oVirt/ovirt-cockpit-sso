@@ -5,7 +5,7 @@ COCKPIT_VERSION=`rpm -q --queryformat '%{VERSION}' cockpit-ws`
 echo Installed cockpit version: ${COCKPIT_VERSION}
 
 # TODO: Following if-clause will be removed once rhel 7.5 is released, see comment in .spec file
-if [ "$COCKPIT_VERSION" -ge 140 ] ; then
+if [ $(echo ""$COCKPIT_VERSION" >= 140" | bc) -ne 0 ] ; then
     echo Cockpit version check passed
 
     echo $$ > /var/run/ovirt-cockpit-sso/ovirt-cockpit-sso.pid
