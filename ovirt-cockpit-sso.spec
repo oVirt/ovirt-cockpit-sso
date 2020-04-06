@@ -1,10 +1,10 @@
 Name:           ovirt-cockpit-sso
 Version:        0.1.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Provides SSO from oVirt Administration Portal to Cockpit
 License:        ASL 2.0
-URL:            https://github.com/oVirt/ovirt-cockpit-sso
-Source0:        https://github.com/oVirt/ovirt-cockpit-sso/archive/%{name}-%{version}.tar.gz
+URL:            https://github.com/oVirt/%{name}
+Source0:        https://resources.ovirt.org/pub/src/%{name}/%{name}-%{version}.tar.gz
 
 %define build_root_dir %{buildroot}%{_datadir}/%{name}
 %define app_root_dir %{_datadir}/%{name}
@@ -64,7 +64,7 @@ case "$1" in
     echo configuring firewall for ovirt-cockpit-sso service - accept 9986/tcp > %{logfile}
     echo Post-installation configuration of %{name} - setting engine FQDN to: ${HOSTNAME} >> %{logfile}
 
-    ## /bin/firewall-cmd --permanent --zone=public --new-service-from-file=%{app_root_dir}/ovirt-cockpit-sso.xml
+    ## /bin/firewall-cmd --permanent --zone=public --new-service-from-file=%%{app_root_dir}/ovirt-cockpit-sso.xml
     /bin/firewall-cmd --permanent --add-port 9986/tcp >> %{logfile}
     /bin/firewall-cmd --reload >> %{logfile}
   ;;
@@ -111,16 +111,19 @@ systemctl daemon-reload
 %config %verify(not md5 size mtime) %{app_root_dir}/config/cockpit/cockpit.conf
 
 %changelog
+* Mon Apr 06 2020 Sandro Bonazzola <sbonazzo@redhat.com> - 0.1.3-2
+- Fix spec file issues
+
 * Thu Apr  2 2020 Sandro Bonazzola - 0.1.3-1
 - Explicitly require Python 3
 
-* Thu Dec 19 2018 Ryan Barry <rbarry@redhat.com> - 0.1.2
+* Thu Dec 19 2019 Ryan Barry <rbarry@redhat.com> - 0.1.2
 - Use python2 explicitly so we build on FC30
 
 * Thu Nov 29 2018 Marek Libra <mlibra@redhat.com> - 0.1.1
 - Exclude cockpit.conf from verification - https://github.com/oVirt/ovirt-cockpit-sso/pull/17
 
-* Mon Aug 3 2018 Marek Libra <mlibra@redhat.com> - 0.1.0
+* Mon Sep  3 2018 Marek Libra <mlibra@redhat.com> - 0.1.0
 - debug logging removed
 - mark cockpit.conf as a config file - https://github.com/oVirt/ovirt-cockpit-sso/pull/15
 
