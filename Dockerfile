@@ -1,6 +1,6 @@
 FROM cockpit/ws:latest
 
-RUN dnf -y install python && dnf clean all
+RUN dnf -y install python3 && dnf clean all
 
 ENV OVIRT_SSO_DEBUG true
 ADD ./container /container

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/python3
 import os
 import sys
 import urlparse
@@ -65,7 +65,6 @@ def send_problem_init(problem, message, auth_methods):
     os.write(1, "{}\n\n{}".format(len(text)+1, text))
 
 def read_size(fd):
-    sep = '\n'
     size = 0
     seen = 0
 
@@ -152,7 +151,7 @@ def get_host(host_id, auth_data):
             host = "{}@{}".format(user, host)
         else:
             sys.stderr.write("Got invalid data: no host_name field")
-    except URLError, err:
+    except URLError as err:
         if hasattr(err, "code"):
             code = err.code
 
@@ -172,7 +171,7 @@ def main(args):
     logger.debug("auth command sent")
     try:
         resp = read_auth_reply()
-    except ValueError, e:
+    except ValueError as e:
         send_problem_init ("internal-error", str(e), {})
         raise
 

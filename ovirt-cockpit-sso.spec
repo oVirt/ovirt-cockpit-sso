@@ -1,5 +1,5 @@
 Name:           ovirt-cockpit-sso
-Version:        0.1.2
+Version:        0.1.3
 Release:        1%{?dist}
 Summary:        Provides SSO from oVirt Administration Portal to Cockpit
 License:        ASL 2.0
@@ -15,7 +15,7 @@ BuildArch: noarch
 # None of the 4.2 features are reuiqred by this package but "Host Console" link is introduced here for the first time
 # using conflicts instead of require because in CentOS Virt SIG repo we can't build ovirt-engine and the require
 # breaks repository closure
-Conflicts: ovirt-engine < 4.2
+Conflicts: ovirt-engine < 4.4
 
 ## TODO: increase to 140 once RHEL 7.5 is released
 ## In fact, cockpit 140 is required but this is eased to allow smooth
@@ -29,6 +29,8 @@ Requires: cockpit-dashboard >= 140
 Requires: cockpit-ws >= 138
 Requires: cockpit-dashboard >= 138
 %endif
+
+Requires: python3
 
 %description
 This package sets cockpit-ws service (see cockpit-project.org) to provide
@@ -109,6 +111,9 @@ systemctl daemon-reload
 %config %verify(not md5 size mtime) %{app_root_dir}/config/cockpit/cockpit.conf
 
 %changelog
+* Thu Apr  2 2020 Sandro Bonazzola - 0.1.3-1
+- Explicitly require Python 3
+
 * Thu Dec 19 2018 Ryan Barry <rbarry@redhat.com> - 0.1.2
 - Use python2 explicitly so we build on FC30
 
