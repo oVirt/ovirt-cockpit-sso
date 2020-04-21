@@ -3,19 +3,14 @@ import os
 import sys
 import urllib
 from urllib.parse import urljoin, quote
+from urllib.request import Request, URLError, urlopen
 import json
 import time
 import logging
+import subprocess
 
 logging.basicConfig()
 logger = logging.getLogger("cockpit-auth-ovirt")
-
-try:
-    from urllib.request import Request, URLError, urlopen
-except:
-    from urllib2 import Request, URLError, urlopen
-
-import subprocess
 
 DEFAULT_API_HOST = "localhost"  # if OVIRT_FQDN env variable is not set
 OVIRT_FQDN = os.environ.get("OVIRT_FQDN", DEFAULT_API_HOST)
