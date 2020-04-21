@@ -12,16 +12,20 @@ import subprocess
 logging.basicConfig()
 logger = logging.getLogger("cockpit-auth-ovirt")
 
-DEFAULT_API_HOST = "localhost"  # if OVIRT_FQDN env variable is not set
+# if OVIRT_FQDN env variable is not set
+DEFAULT_API_HOST = "localhost"
 OVIRT_FQDN = os.environ.get("OVIRT_FQDN", DEFAULT_API_HOST)
 
-ROOT_DIR_PREFIX = os.environ.get("ROOT_DIR_PREFIX", "") # "/host" for container or empty otherwise
+# "/host" for container or empty otherwise
+ROOT_DIR_PREFIX = os.environ.get("ROOT_DIR_PREFIX", "")
 
-OVIRT_CA_FILE = "{0}/usr/share/ovirt-cockpit-sso/ca.pem".format(ROOT_DIR_PREFIX) # pre-loaded content of https://[FQDN]/ovirt-engine/services/pki-resource?resource=ca-certificate&format=X509-PEM-CA
+# pre-loaded content of https://[FQDN]/ovirt-engine/services/pki-resource?resource=ca-certificate&format=X509-PEM-CA
+OVIRT_CA_FILE = "{0}/usr/share/ovirt-cockpit-sso/ca.pem".format(ROOT_DIR_PREFIX)
 COCKPIT_SSH_COMMAND = "{0}/usr/libexec/cockpit-ssh".format(ROOT_DIR_PREFIX)
 
 ENGINE_P12 = "{0}/etc/pki/ovirt-engine/keys/engine.p12".format(ROOT_DIR_PREFIX)
-PKI_PASSWORD = "mypass" # TODO: read it from /etc/ovirt-engine/engine.conf.d/10-setup-pki.conf as ENGINE_PKI_ENGINE_STORE_PASSWORD
+# TODO: read it from /etc/ovirt-engine/engine.conf.d/10-setup-pki.conf as ENGINE_PKI_ENGINE_STORE_PASSWORD
+PKI_PASSWORD = "mypass"
 KEY_GEN_SH = "{0}/usr/share/ovirt-cockpit-sso/keygen.sh".format(ROOT_DIR_PREFIX)
 
 DEFAULT_USER = "root"
@@ -113,7 +117,10 @@ def read_key():
     #
     # RSA header is supported only
     # unsupported fingerprints etc. are removed from the beginning
-    private_key = subprocess.Popen([KEY_GEN_SH, ENGINE_P12, PKI_PASSWORD], stdout=subprocess.PIPE)
+    private_key = subprocess.Popen(
+        [KEY_GEN_SH, ENGINE_P12, PKI_PASSWORD],
+        stdout=subprocess.PIPE
+    )
     return private_key.communicate()[0]
 
 
@@ -125,7 +132,10 @@ def send_key():
 
 
 def get_host(host_id, auth_data):
-    url = urljoin("https://{0}".format(OVIRT_FQDN), "/ovirt-engine/api/hosts/{}".format(quote(host_id)))
+    url = urljoin(
+        "https://{0}".format(OVIRT_FQDN),
+        "/ovirt-engine/api/hosts/{}".format(quote(host_id))
+    )
 
     q = Request(url)
     q.add_header("Authorization", auth_data)
@@ -188,7 +198,11 @@ def main(args):
         if code == 404:
             send_problem_init("unknown-host", None, None)
         else:
-            send_problem_init("internal-error", "Error validating auth token", None)
+            send_problem_init(
+                "internal-error",
+                "Error validating auth token",
+                None
+            )
         sys.exit(1)
 
     send_key()
