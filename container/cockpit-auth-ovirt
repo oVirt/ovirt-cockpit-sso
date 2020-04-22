@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 import os
 import sys
-import urlparse
 import urllib
+from urllib.parse import urljoin, quote
 import json
 import time
 import logging
@@ -122,7 +122,7 @@ def send_key():
 
 
 def get_host(host_id, auth_data):
-    url = urlparse.urljoin("https://{0}".format(OVIRT_FQDN), "/ovirt-engine/api/hosts/{}".format(urllib.quote(host_id)))
+    url = urljoin("https://{0}".format(OVIRT_FQDN), "/ovirt-engine/api/hosts/{}".format(quote(host_id)))
 
     q = Request(url)
     q.add_header("Authorization", auth_data)
