@@ -12,23 +12,29 @@ import subprocess
 logging.basicConfig()
 logger = logging.getLogger("cockpit-auth-ovirt")
 
-DEFAULT_API_HOST = "localhost"  # if OVIRT_FQDN env variable is not set
+# if OVIRT_FQDN env variable is not set
+DEFAULT_API_HOST = "localhost"
 OVIRT_FQDN = os.environ.get("OVIRT_FQDN", DEFAULT_API_HOST)
 
-ROOT_DIR_PREFIX = os.environ.get("ROOT_DIR_PREFIX", "") # "/host" for container or empty otherwise
+# "/host" for container or empty otherwise
+ROOT_DIR_PREFIX = os.environ.get("ROOT_DIR_PREFIX", "")
 
-OVIRT_CA_FILE = "{0}/usr/share/ovirt-cockpit-sso/ca.pem".format(ROOT_DIR_PREFIX) # pre-loaded content of https://[FQDN]/ovirt-engine/services/pki-resource?resource=ca-certificate&format=X509-PEM-CA
+# pre-loaded content of https://[FQDN]/ovirt-engine/services/pki-resource?resource=ca-certificate&format=X509-PEM-CA
+OVIRT_CA_FILE = "{0}/usr/share/ovirt-cockpit-sso/ca.pem".format(ROOT_DIR_PREFIX)
 COCKPIT_SSH_COMMAND = "{0}/usr/libexec/cockpit-ssh".format(ROOT_DIR_PREFIX)
 
 ENGINE_P12 = "{0}/etc/pki/ovirt-engine/keys/engine.p12".format(ROOT_DIR_PREFIX)
-PKI_PASSWORD = "mypass" # TODO: read it from /etc/ovirt-engine/engine.conf.d/10-setup-pki.conf as ENGINE_PKI_ENGINE_STORE_PASSWORD
+# TODO: read it from /etc/ovirt-engine/engine.conf.d/10-setup-pki.conf as ENGINE_PKI_ENGINE_STORE_PASSWORD
+PKI_PASSWORD = "mypass"
 KEY_GEN_SH = "{0}/usr/share/ovirt-cockpit-sso/keygen.sh".format(ROOT_DIR_PREFIX)
 
 DEFAULT_USER = "root"
 
+
 def usage():
     sys.stderr.write("usage {} [user@]host[:port]\n".format(sys.argv[0]))
     sys.exit(os.EX_USAGE)
+
 
 def send_auth_command(challenge, response):
     cmd = {
@@ -44,6 +50,7 @@ def send_auth_command(challenge, response):
     text = json.dumps(cmd)
     os.write(1, "{}\n\n{}".format(len(text)+1, text))
 
+
 def send_problem_init(problem, message, auth_methods):
     cmd = {
         "command": "init",
@@ -58,6 +65,7 @@ def send_problem_init(problem, message, auth_methods):
 
     text = json.dumps(cmd)
     os.write(1, "{}\n\n{}".format(len(text)+1, text))
+
 
 def read_size(fd):
     size = 0
@@ -80,6 +88,7 @@ def read_size(fd):
 
     return size
 
+
 def read_frame(fd):
     size = read_size(fd)
 
@@ -91,6 +100,7 @@ def read_frame(fd):
 
     return data
 
+
 def read_auth_reply():
     data = read_frame(1)
     cmd = json.loads(data)
@@ -101,13 +111,18 @@ def read_auth_reply():
 
     return response
 
+
 def read_key():
     # generate private key from .p12 file
     #
     # RSA header is supported only
     # unsupported fingerprints etc. are removed from the beginning
-    private_key = subprocess.Popen([KEY_GEN_SH, ENGINE_P12, PKI_PASSWORD], stdout=subprocess.PIPE)
+    private_key = subprocess.Popen(
+        [KEY_GEN_SH, ENGINE_P12, PKI_PASSWORD],
+        stdout=subprocess.PIPE
+    )
     return private_key.communicate()[0]
+
 
 def send_key():
     logger.debug("send_key() starts")
@@ -117,7 +132,10 @@ def send_key():
 
 
 def get_host(host_id, auth_data):
-    url = urljoin("https://{0}".format(OVIRT_FQDN), "/ovirt-engine/api/hosts/{}".format(quote(host_id)))
+    url = urljoin(
+        "https://{0}".format(OVIRT_FQDN),
+        "/ovirt-engine/api/hosts/{}".format(quote(host_id))
+    )
 
     q = Request(url)
     q.add_header("Authorization", auth_data)
@@ -128,7 +146,7 @@ def get_host(host_id, auth_data):
     try:
         logger.debug("oVirt: requesting host: %s", url)
         r = urlopen(q, cafile=OVIRT_CA_FILE)
-        
+
         logger.debug("Data received")
         code = r.getcode()
         logger.debug("code: %s", code)
@@ -157,17 +175,18 @@ def get_host(host_id, auth_data):
 
     return code, host
 
+
 def main(args):
     if len(args) != 2:
         usage()
 
     logger.debug("cockpit-ovirt-auth starts")
-    send_auth_command ("*", None)
+    send_auth_command("*", None)
     logger.debug("auth command sent")
     try:
         resp = read_auth_reply()
     except ValueError as e:
-        send_problem_init ("internal-error", str(e), {})
+        send_problem_init("internal-error", str(e), {})
         raise
 
     logger.debug("oVirt response received")
@@ -175,11 +194,15 @@ def main(args):
     if not host:
         if code == 401:
             send_problem_init("authentication-failed", "Token was not valid",
-                              { "password": "not-tried", "token": "denied" })
+                              {"password": "not-tried", "token": "denied"})
         if code == 404:
             send_problem_init("unknown-host", None, None)
         else:
-            send_problem_init("internal-error", "Error validating auth token", None)
+            send_problem_init(
+                "internal-error",
+                "Error validating auth token",
+                None
+            )
         sys.exit(1)
 
     send_key()
@@ -187,6 +210,6 @@ def main(args):
     os.environ["COCKPIT_SSH_ALLOW_UNKNOWN"] = "1"
     os.execlpe(COCKPIT_SSH_COMMAND, COCKPIT_SSH_COMMAND, host, os.environ)
 
+
 if __name__ == '__main__':
     main(sys.argv)
-
