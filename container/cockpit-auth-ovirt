@@ -48,7 +48,7 @@ def send_auth_command(challenge, response):
         cmd["response"] = response
 
     text = json.dumps(cmd)
-    os.write(1, "{}\n\n{}".format(len(text)+1, text))
+    os.write(1, str.encode("{}\n\n{}".format(len(text)+1, text)))
 
 
 def send_problem_init(problem, message, auth_methods):
@@ -64,7 +64,7 @@ def send_problem_init(problem, message, auth_methods):
         cmd["auth-method-results"] = auth_methods
 
     text = json.dumps(cmd)
-    os.write(1, "{}\n\n{}".format(len(text)+1, text))
+    os.write(1, str.encode("{}\n\n{}".format(len(text)+1, text)))
 
 
 def read_size(fd):
@@ -72,7 +72,7 @@ def read_size(fd):
     seen = 0
 
     while True:
-        t = os.read(fd, 1)
+        t = bytes.decode(os.read(fd, 1))
 
         if not t:
             return 0
@@ -94,7 +94,7 @@ def read_frame(fd):
 
     data = ""
     while size > 0:
-        d = os.read(fd, size)
+        d = bytes.decode(os.read(fd, size))
         size = size - len(d)
         data = data + d
 
