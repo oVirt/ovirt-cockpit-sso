@@ -121,7 +121,8 @@ def read_key():
         [KEY_GEN_SH, ENGINE_P12, PKI_PASSWORD],
         stdout=subprocess.PIPE
     )
-    return private_key.communicate()[0]
+    private_key = bytes.decode(private_key.communicate()[0])
+    return private_key
 
 
 def send_key():
