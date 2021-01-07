@@ -24,10 +24,10 @@ Conflicts: ovirt-engine < 4.4
 %if 0%{?fedora} >= 26
 ## fedora >26 is fine
 Requires: cockpit-ws >= 140
-Requires: cockpit-dashboard >= 140
+Requires: cockpit-system >= 224
 %else
 Requires: cockpit-ws >= 138
-Requires: cockpit-dashboard >= 138
+Requires: cockpit-system >= 224
 %endif
 
 Requires: python3
