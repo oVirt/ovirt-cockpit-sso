@@ -1,6 +1,6 @@
 Name:           ovirt-cockpit-sso
 Version:        0.1.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Provides SSO from oVirt Administration Portal to Cockpit
 License:        ASL 2.0
 URL:            https://github.com/oVirt/%{name}
@@ -111,6 +111,9 @@ systemctl daemon-reload
 %config %verify(not md5 size mtime) %{app_root_dir}/config/cockpit/cockpit.conf
 
 %changelog
+* Sun Jan 10 2021 - Yedidyah Bar David <didi@redhat.com> - 0.1.4-2
+- spec: update cockpit requirements
+
 * Thu Apr 23 2020 Lev Veyde <lveyde@redhat.com> - 0.1.4-1
 - Fixed BZ1826248 - https://bugzilla.redhat.com/1826248
 
