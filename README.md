@@ -1,5 +1,5 @@
-
 # oVirt-Cockpit SSO
+[![Copr build status](https://copr.fedorainfracloud.org/coprs/ovirt/ovirt-master-snapshot/package/ovirt-cockpit-sso/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/ovirt/ovirt-master-snapshot/package/ovirt-cockpit-sso/)
 
 Provides `cockpit-ws` service configured to handle SSO from oVirt's Administration Portal to Cockpit running on an oVirt host.
 
@@ -7,7 +7,7 @@ Distributed either as ``rpm`` or ``docker image`` (experimental).
 
 Please note, the provided ``docker image`` is based on the Cockpit-Container project and is so far **experimental only** and work-in-progress.
 
-## Main use case: 
+## Main use case:
   - log into oVirt's Administration Portal (available for `admin` users only)
   - find particular host and click `Host Console`
   - host's Cockpit session is opened while no password needs to be entered
@@ -56,10 +56,10 @@ curl -v -i --insecure --header "Accept: application/xml" --header "Filter: true"
 https://[ENGINE_FQDN]:9986/=[OVIRT_HOST_UUID]/machines#access_token=[VALID_OVIRT_ACCESS_TOKEN]
 ```
 
-If everything is ok, the browser shall end up with open Cockpit session for the `root` user on the specified host machine. 
+If everything is ok, the browser shall end up with open Cockpit session for the `root` user on the specified host machine.
 
 ## Docker
-**Experimental only**, might be broken in favor of the rpm installation 
+**Experimental only**, might be broken in favor of the rpm installation
 
 On the oVirt engine machine:
 
