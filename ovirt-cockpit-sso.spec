@@ -17,19 +17,8 @@ BuildArch: noarch
 # breaks repository closure
 Conflicts: ovirt-engine < 4.4
 
-## TODO: increase to 140 once RHEL 7.5 is released
-## In fact, cockpit 140 is required but this is eased to allow smooth
-## deployment for testing in the meantime
-## cockpit 140 is farther enforced in start.sh which is called by systemd
-%if 0%{?fedora} >= 26
-## fedora >26 is fine
 Requires: cockpit-ws >= 140
 Requires: cockpit-system >= 224
-%else
-Requires: cockpit-ws >= 138
-Requires: cockpit-system >= 224
-%endif
-
 Requires: python3
 
 %description
