@@ -8,7 +8,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Build
-        run: docker run -v $(pwd):/work --workdir /work -ti centos:centos8 /bin/bash -c 'yum install -y rpm-build $(cat automation/build-artifacts.packages) && ./automation/build-artifacts-manual.sh'
+        run: docker run -v $(pwd):/work --workdir /work centos:centos8 /bin/bash -c 'yum install -y rpm-build $(cat automation/build-artifacts.packages) && ./automation/build-artifacts-manual.sh'
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
