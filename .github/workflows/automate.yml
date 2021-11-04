@@ -3,6 +3,7 @@ on:
   [push, pull_request]
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
     container:
       image: quay.io/centos/centos:stream8
