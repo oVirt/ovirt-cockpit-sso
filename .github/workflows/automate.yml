@@ -1,0 +1,32 @@
+name: Build
+on:
+  [push, pull_request]
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    container:
+      image: quay.io/centos/centos:stream8
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install packages
+        run: yum install -y rpm-build yum-utils git make
+      - name: Make distclean
+        run: make distclean
+      - name: Make dist
+        run: make dist
+      - name: Make srpm
+        run: make srpm
+      - name: Make RPM
+        run: make rpm
+      - name: Collect artifacts
+        run: |
+          mkdir -p exported-artifacts
+          find tmp.repos -iname \*rpm -exec mv "{}" exported-artifacts/ \;
+          mv ./*tar.gz exported-artifacts/
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifacts
+          path: exported-artifacts/
