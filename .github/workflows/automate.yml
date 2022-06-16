@@ -1,17 +1,25 @@
-name: Build
+name: build
 on:
   [push, pull_request]
 jobs:
   build:
-    name: Build
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: centos-stream-8
+            shortcut: cs8
+            container-name: el8stream
+          - name: centos-stream-9
+            shortcut: cs9
+            container-name: el9stream
+    name: ${{ matrix.name }}
     container:
-      image: quay.io/centos/centos:stream9
+      image: quay.io/ovirt/buildcontainer:${{ matrix.container-name }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Install packages
-        run: yum install -y rpm-build yum-utils git make
       - name: Make distclean
         run: make distclean
       - name: Make dist
@@ -24,9 +32,7 @@ jobs:
         run: |
           mkdir -p exported-artifacts
           find tmp.repos -iname \*rpm -exec mv "{}" exported-artifacts/ \;
-          mv ./*tar.gz exported-artifacts/
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: ovirt/upload-rpms-action@v2
         with:
-          name: artifacts
-          path: exported-artifacts/
+          directory: exported-artifacts
