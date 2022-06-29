@@ -1,7 +1,7 @@
 .PHONY: installdeps git_cfg_safe srpm
 
 installdeps:
-	dnf -y install make
+	dnf -y install make git
 
 git_cfg_safe:
 	# From git 2.35.2 we need to mark temporary directory, where the project is cloned to, as safe, otherwise
