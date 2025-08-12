@@ -8,18 +8,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: centos-stream-8
-            shortcut: cs8
-            container-name: el8stream
           - name: centos-stream-9
             shortcut: cs9
             container-name: el9stream
+          - name: centos-stream-10
+            shortcut: cs10
+            container-name: el10stream
     name: ${{ matrix.name }}
     container:
       image: quay.io/ovirt/buildcontainer:${{ matrix.container-name }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: ovirt/checkout-action@main
       - name: Make distclean
         run: make distclean
       - name: Make dist
@@ -33,6 +33,6 @@ jobs:
           mkdir -p exported-artifacts
           find tmp.repos -iname \*rpm -exec mv "{}" exported-artifacts/ \;
       - name: Upload artifacts
-        uses: ovirt/upload-rpms-action@v2
+        uses: ovirt/upload-rpms-action@main
         with:
           directory: exported-artifacts
