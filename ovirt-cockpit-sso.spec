@@ -17,6 +17,8 @@ BuildArch: noarch
 # breaks repository closure
 Conflicts: ovirt-engine < 4.4
 
+BuildRequires: make
+
 Requires: cockpit-ws >= 140
 Requires: cockpit-system >= 224
 Requires: python3
