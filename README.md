@@ -1,5 +1,4 @@
 # oVirt-Cockpit SSO
-[![Copr build status](https://copr.fedorainfracloud.org/coprs/ovirt/ovirt-master-snapshot/package/ovirt-cockpit-sso/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/ovirt/ovirt-master-snapshot/package/ovirt-cockpit-sso/)
 
 Provides `cockpit-ws` service configured to handle SSO from oVirt's Administration Portal to Cockpit running on an oVirt host.
 
@@ -20,10 +19,6 @@ Requires `cockpit version >140`.
 Verified against ovirt-engine 4.2.
 
 Engine's hostname must be properly set (see `hostname -f`) before `rpm -i` is invoked.
-
-RPM builds can be found in [Fedora Copr ovirt-cockpit-sso](https://copr.fedorainfracloud.org/coprs/mlibra/ovirt-cockpit-sso/)
-
-Please download RPMs from [Project yum repository](http://people.redhat.com/mlibra/repos/ovirt-cockpit-sso/).
 
 ### To install:
 ```

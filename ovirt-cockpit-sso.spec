@@ -1,6 +1,8 @@
+%{!?PACKAGE_RPM_RELEASE: %define PACKAGE_RPM_RELEASE 0.master}
+
 Name:           ovirt-cockpit-sso
 Version:        0.1.4
-Release:        3%{?dist}
+Release:        %{PACKAGE_RPM_RELEASE}%{?release_suffix}%{?dist}
 Summary:        Provides SSO from oVirt Administration Portal to Cockpit
 License:        ASL 2.0
 URL:            https://github.com/oVirt/%{name}

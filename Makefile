@@ -20,10 +20,13 @@ PACKAGE_VERSION = 0.1.4
 PACKAGE_NAME = $(PACKAGE_TARNAME)-$(PACKAGE_VERSION)
 TGZ = $(PACKAGE_NAME).tar.gz
 
+PACKAGE_RPM_RELEASE ?= 3.master
+
 TMPREPOS = tmp.repos
 RPMBUILD_ARGS :=
 RPMBUILD_ARGS += --define="_topdir `pwd`/$(TMPREPOS)"
-RPMBUILD_ARGS += $(if $(RELEASE_SUFFIX), --define="release_suffix $$RELEASE_SUFFIX")
+RPMBUILD_ARGS += --define="PACKAGE_RPM_RELEASE $(PACKAGE_RPM_RELEASE)"
+RPMBUILD_ARGS += $(if $(RELEASE_SUFFIX),--define="release_suffix $(RELEASE_SUFFIX)")
 
 SOURCES = \
 	container/cockpit-auth-ovirt \
